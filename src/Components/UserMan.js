@@ -5,6 +5,8 @@ import { arrOfApplication } from "./arrOfApplication";
 import Photos from "./Photos";
 import { arrayOfEnvironments } from "./arrOfEnvironments";
 import SideNavBar from "./SideNavBar/SideNavBar";
+import {practiceArr} from "./practiceArr";
+import { Form } from "react-router-dom";
 
 export function UserMan(){
 
@@ -100,10 +102,11 @@ export function UserMan(){
     }
    
     const onchangeHandleEnvironments = e => {
-      setDataEnvironment([{...dataEnvironment,[e.target.name]:e.target.value}])
+      setDataEnvironment({...dataEnvironment,[e.target.name]:e.target.value});
     }
      
-    const submitHandle = () => {
+    const submitHandle = (e) => {
+      e.preventDefault();
       console.log("Data : "+data);
       let newId = app.length + 1;
       const newValue = [{
@@ -156,12 +159,18 @@ export function UserMan(){
         setId(id);
       }
 
+      const [duplicateArr,setDuplicate] = useState([]);
+
+      const getduplicateOnClice = (id) => {
+        let displayEnvi = practiceArr.filter(x => x.App === id);
+        setDuplicate(displayEnvi);
+      }
+
 
       function updateEnvironments(){
        let appWtID = app.filter(m=>m.id === appId);
         let env = appWtID.map(m=>m.environments);
         console.log(env.map(m=>m));
-
         let c=0;
         arrayOfEnvironments.map(m=>{c++});
          appWtID = app.filter(m=>m.id === appId);
@@ -171,13 +180,37 @@ export function UserMan(){
         let appdata = app.filter(m=>m.id !== appId);
         const updatedApps = [...appdata, ...appWtID];
         setapp(updatedApps);
-
         appWtID = app.filter(m=>m.id === appId);
          env = appWtID.map(m=>m.environments);
         console.log(env.map(m=>m));
-
       }
 
+      
+      const saveEnvironment = e => {
+        e.preventDefault();
+        console.log("dataBefore =" +dataEnvironment);
+        console.log("datavalue" +dataEnvironment.name);
+        console.log("datavalue" +dataEnvironment.type);
+        console.log("datavalue" +dataEnvironment.dataSourceLink);
+        console.log("datavalue" +dataEnvironment.UiD);
+        console.log("datavalue" +dataEnvironment.IssourcePrimary);
+        const increasedSize = practiceArr.length +1;
+        console.log(increasedSize);
+        let addDuplicate = [{
+        id: increasedSize,
+        App: appId,
+        Name: dataEnvironment.name,
+        image: "./images/database1.jpg",
+        Type:dataEnvironment.type,
+        DataSourceLink: dataEnvironment.dataSourceLink,
+        UApp: dataEnvironment.UiD,
+        Password: dataEnvironment.password,
+        IsSourcePrimary: dataEnvironment.IssourcePrimary
+        }];
+        console.log("Duplicate" +addDuplicate);
+        let newDuplicate = [...environment,...addDuplicate];
+        setDataEnvironment(newDuplicate);
+      }
 
     return(
         <div>
@@ -206,7 +239,6 @@ export function UserMan(){
                         <label htmlFor="exampleInputPassword1"  className="form-label">Created by</label>
                         <input type="text" name='createdBy' className="form-control" value={createdBy} onChange={onchangeHandle} />
                       </div>
-                      
                       <button onClick={submitHandle} type="submit" data-dismiss="modal" className="btn btn-dark btn-center">Create</button>
                     </form>
                     </div>
@@ -230,14 +262,14 @@ export function UserMan(){
     
     <div className="modal-body">
       <div>
-      <form>
+      <form >
       <div className="mb-3 row">
       <label htmlFor="exampleInputEmail1" className="col-sm-4 form-label">Environment name</label>
     <div className="col-sm-8">
     <input type="text" name="name" value={name} className="form-control" onChange={onchangeHandleEnvironments} aria-describedby="emailHelp"/>    </div>
   </div>
   <div className="mb-3 row">
-    <label HtmlFor="inputPassword" className="col-sm-4 form-label">Environment Type</label>
+    <label htmlFor="inputPassword" className="col-sm-4 form-label">Environment Type</label>
     <div className='col-sm-8'>
     <select className="form-select" name='type' value={type} onChange={onchangeHandleEnvironments} aria-label="Default select example">
           <option selected>--- please select ---</option>
@@ -273,10 +305,9 @@ export function UserMan(){
         </div>
         </div>
       </div>
-      <button type="submit" onClick={updateEnvironments} data-dismiss="modal" className="btn btn-dark btn-center">Submit</button>
+      <button type="submit"  onClick={saveEnvironment} data-dismiss="modal" className="btn btn-dark btn-center">Submit</button>
       </form>
     </div>
-    
     </div>
     <div className="modal-footer">
     </div>
@@ -330,7 +361,7 @@ export function UserMan(){
                 app.map((item) => {
                     return(
                         <div className='col-md-2 mb-5' key={item.id}>
-                        <div className="card" onClick= {()=>getAppsOnClick(item.id)}>
+                        <div className="card" onClick= {() => getduplicateOnClice(item.id)}>
                             {/*onClick={() => deleteOnClick(item.id)}*/}
                         <img  onClick={() => deleteApplication(item.id)} src="./images/delete.jpg" className="buttonImage" alt="..."/>
             <div className='UserImage'>
@@ -371,7 +402,7 @@ export function UserMan(){
 
       <div className='UsersBlock'>
           {
-                Environments.map((item) => {
+                duplicateArr.map((item) => {
                     return(
                         <div className='col-md-2 mb-5' key={item.id}>
                         <div className="card" style={{height:"80%",marginTop:"10px"}}>
@@ -394,9 +425,6 @@ export function UserMan(){
   </div>
 </div>                   
 </div>
-
-
-
     );
 
 }
